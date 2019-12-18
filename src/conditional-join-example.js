@@ -52,6 +52,29 @@ function doesPathExist(nodes, path) {
   return doesPathExist(node.selectionSet.selections, path.slice(1));
 }
 
+function doesUnionPathExist(nodes, path, union_interface) {
+  if (!nodes) {
+      return false;
+    }
+
+    const node = nodes.find(x => x.name.value === path[0]);
+
+    if (!node) {
+      return false;
+    }
+
+    if (path.length === 1) {
+      return true;
+    }
+
+    if (union_interface != null) {
+      const union = node.selectionSet.selections.find(x => x.typeCondition.name.value === union_interface);
+      return doesUnionPathExist(union.selectionSet.selections, path.slice(1), null);
+    } else {
+      return doesPathExist(nodes, path.slice(1));
+    }
+}
+
 const resolvers = {
   Query: {
     books: async (_, __, ___, info) => {
